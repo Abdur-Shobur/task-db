@@ -1,100 +1,407 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Device Status Dashboard
 
-## Getting Started
+A modern, full-stack device monitoring dashboard built with Next.js 16, React, and TypeScript. This application provides real-time device status tracking, authentication, and comprehensive device management capabilities.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### Authentication
+
+- **Secure Login System**: Hardcoded authentication with NextAuth.js integration
+- **Session Management**: JWT-based session handling with NextAuth
+- **Protected Routes**: Middleware-based route protection for dashboard pages
+- **Auto-redirect**: Authenticated users are automatically redirected from login page
+
+### Device Management
+
+- **Device Registration**: Register new devices with ID, name, type, and status
+- **Device Listing**: View all registered devices with filtering and search
+- **Status Management**: Update device status (online/offline) with optimistic updates
+- **Device Details**: View comprehensive device information and test results
+- **Device Deletion**: Remove devices from the system
+- **Device Updates**: Edit device name and type
+
+### Dashboard Features
+
+- **Statistics Toolbar**: Real-time statistics showing:
+  - Total devices count
+  - Online devices count with percentage
+  - Offline devices count with percentage
+- **Search & Filter**:
+  - Search devices by name, ID, or type
+  - Filter by status (online/offline)
+  - Debounced search for optimal performance
+- **Test Results**: View mock laboratory test results for each device
+- **Responsive Design**: Mobile-first design with Tailwind CSS
+
+### UI/UX
+
+- **Modern UI**: Built with shadcn/ui components
+- **Dark Mode Support**: Full dark mode compatibility
+- **Loading States**: Comprehensive loading and error state handling
+- **Toast Notifications**: User-friendly feedback for all actions
+- **Form Validation**: Zod schema validation with React Hook Form
+- **Optimistic Updates**: Instant UI updates for better UX
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+- **Next.js 16**: React framework with App Router
+- **React 19**: UI library
+- **TypeScript**: Type-safe development
+- **Tailwind CSS 4**: Utility-first CSS framework
+- **shadcn/ui**: High-quality component library
+- **React Hook Form**: Form state management
+- **Zod**: Schema validation
+- **RTK Query**: Data fetching and caching
+- **Redux Toolkit**: State management
+- **NextAuth.js**: Authentication
+- **date-fns**: Date formatting
+- **recharts**: Data visualization
+- **lucide-react**: Icon library
+
+### Backend
+
+- **Next.js API Routes**: RESTful API endpoints
+- **In-Memory Storage**: Device data stored in memory (no database required)
+- **Zod Validation**: Request/response validation
+- **TypeScript**: Type-safe API development
+
+## 📋 Prerequisites
+
+- Node.js 18+
+- npm or yarn or pnpm
+
+## 🔧 Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd task1
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   ```
+
+3. **Set up environment variables**
+
+   Create a `.env.local` file in the root directory:
+
+   ```env
+   NEXT_PUBLIC_BACKEND_API="http://localhost:3000"
+   NEXTAUTH_URL="http://localhost:3000"
+   NEXTAUTH_SECRET="your-super-secret-nextauth-key-change-in-production-2024"
+   ```
+
+4. **Run the development server**
+
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   # or
+   pnpm dev
+   ```
+
+5. **Open your browser**
+
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 🔐 Authentication
+
+### Demo Credentials
+
+The application includes hardcoded credentials for development:
+
+- **Admin User**
+
+  - Email: `admin@example.com`
+  - Password: `admin123`
+
+- **Test User**
+  - Email: `user@example.com`
+  - Password: `user123`
+
+> **Note**: In production, these should be replaced with a proper authentication system using a database and hashed passwords.
+
+## 📡 API Endpoints
+
+### Authentication
+
+#### `POST /api/auth/login`
+
+Login endpoint for user authentication.
+
+**Request Body:**
+
+```json
+{
+	"email": "admin@example.com",
+	"password": "admin123"
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Response:**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Device API Authentication
-
-The device API endpoints are protected with basic API key authentication.
-
-### Default API Key
-- **API Key**: `device-api-key-2024` (hardcoded for development)
-
-### Configuration
-You can set custom API keys using environment variables:
-
-```env
-# Server-side (for API route validation)
-DEVICE_API_KEY=your-secret-api-key
-
-# Client-side (for frontend requests)
-NEXT_PUBLIC_DEVICE_API_KEY=your-secret-api-key
+```json
+{
+	"status": true,
+	"message": "Login successful",
+	"data": {
+		"accessToken": "mock-access-token-1-1234567890",
+		"refreshToken": "mock-refresh-token-1-1234567890",
+		"user": {
+			"id": 1,
+			"name": "Admin User",
+			"email": "admin@example.com"
+		}
+	},
+	"statusCode": 200,
+	"meta": null
+}
 ```
 
-### Usage
+### Device Management
 
-#### Using RTK Query (Automatic)
-The RTK Query setup automatically includes the API key in all requests via the `X-API-Key` header.
+#### `GET /api/devices`
 
-#### Direct Fetch Calls
-When making direct fetch calls, include the API key:
+Get all devices with optional status filtering.
 
-```typescript
-const apiKey = process.env.NEXT_PUBLIC_DEVICE_API_KEY || 'device-api-key-2024';
-const res = await fetch('/api/devices', {
-  headers: {
-    'X-API-Key': apiKey,
-  },
-});
+**Query Parameters:**
+
+- `status` (optional): `online` | `offline`
+
+**Headers:**
+
+- `X-API-Key`: `device-api-key-2024` (default)
+
+**Example:**
+
+```
+GET /api/devices?status=online
 ```
 
-#### External API Calls
-For external API calls (e.g., from desktop applications), include the API key in headers:
+**Response:**
 
-```bash
-# Using X-API-Key header
-curl -H "X-API-Key: device-api-key-2024" http://localhost:3000/api/devices
-
-# Or using Authorization header
-curl -H "Authorization: Bearer device-api-key-2024" http://localhost:3000/api/devices
+```json
+[
+	{
+		"uuid": "550e8400-e29b-41d4-a716-446655440000",
+		"deviceId": "DEV-001",
+		"deviceName": "Temperature Sensor",
+		"deviceType": "Sensor",
+		"status": "online",
+		"lastUpdated": "2024-01-15T10:30:00.000Z"
+	}
+]
 ```
 
-### Protected Endpoints
-All device API endpoints require authentication:
-- `GET /api/devices` - List devices
-- `POST /api/devices/register` - Register new device
-- `PATCH /api/devices/:uuid` - Update device
-- `PATCH /api/devices/:uuid/status` - Update device status
-- `DELETE /api/devices/:uuid` - Delete device
-- `GET /api/devices/:uuid/data` - Get device test results
+#### `POST /api/devices/register`
 
-### Security Notes
-⚠️ **For Production:**
-- Change the default API key
-- Store API keys in environment variables
-- Use HTTPS for all API communications
-- Consider implementing JWT tokens or OAuth2 for more robust authentication
-- Implement rate limiting
-- Add request signing/HMAC for device-to-server communication
+Register a new device.
 
-## Deploy on Vercel
+**Request Body:**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```json
+{
+	"deviceId": "DEV-001",
+	"deviceName": "Temperature Sensor",
+	"deviceType": "Sensor",
+	"status": "online"
+}
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Response:**
+
+```json
+{
+	"uuid": "550e8400-e29b-41d4-a716-446655440000",
+	"deviceId": "DEV-001",
+	"deviceName": "Temperature Sensor",
+	"deviceType": "Sensor",
+	"status": "online",
+	"lastUpdated": "2024-01-15T10:30:00.000Z"
+}
+```
+
+#### `PATCH /api/devices/:uuid`
+
+Update device details (name and type).
+
+**Request Body:**
+
+```json
+{
+	"deviceName": "Updated Name",
+	"deviceType": "Updated Type"
+}
+```
+
+#### `PATCH /api/devices/:uuid/status`
+
+Update device status.
+
+**Request Body:**
+
+```json
+{
+	"status": "online"
+}
+```
+
+#### `DELETE /api/devices/:uuid`
+
+Delete a device.
+
+**Response:**
+
+```json
+{
+	"message": "Device deleted successfully"
+}
+```
+
+#### `GET /api/devices/:uuid/data`
+
+Get mock test results for a device.
+
+**Response:**
+
+```json
+[
+	{
+		"id": "test-1",
+		"timestamp": "2024-01-15T10:30:00.000Z",
+		"testType": "Temperature",
+		"value": 25.5,
+		"unit": "°C",
+		"status": "normal"
+	}
+]
+```
+
+## 📁 Project Structure
+
+```
+task1/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── api/                # API routes
+│   │   │   ├── auth/           # Authentication endpoints
+│   │   │   └── devices/        # Device management endpoints
+│   │   ├── dashboard/          # Protected dashboard pages
+│   │   │   └── devices/        # Device management page
+│   │   ├── login/              # Login page
+│   │   └── page.tsx            # Home/Login page
+│   ├── components/             # React components
+│   │   ├── ui/                 # shadcn/ui components
+│   │   └── common/             # Shared components
+│   ├── lib/                    # Utility functions
+│   │   ├── device-store.ts     # In-memory device storage
+│   │   ├── api-auth.ts         # API authentication
+│   │   └── auth.ts             # NextAuth configuration
+│   ├── store/                  # Redux store
+│   │   └── features/           # Feature slices
+│   │       ├── api/            # API slice configuration
+│   │       ├── auth/           # Authentication feature
+│   │       └── device/          # Device management feature
+│   ├── types/                  # TypeScript type definitions
+│   └── hooks/                  # Custom React hooks
+├── public/                     # Static assets
+├── .env.local                  # Environment variables
+├── middleware.ts               # Next.js middleware (route protection)
+├── package.json                # Dependencies and scripts
+├── tsconfig.json               # TypeScript configuration
+└── README.md                   # This file
+```
+
+## 🎯 Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run type-check` - Run TypeScript type checking
+
+## 🔒 Security Considerations
+
+### Current Implementation
+
+- Hardcoded credentials (development only)
+- In-memory data storage (data lost on server restart)
+- Mock JWT tokens
+
+### Production Recommendations
+
+1. **Database Integration**: Replace in-memory storage with a proper database (PostgreSQL, MongoDB, etc.)
+2. **Password Hashing**: Use bcrypt or similar for password hashing
+3. **JWT Tokens**: Implement proper JWT token generation and validation
+4. **API Security**: Add rate limiting, CORS configuration, and input sanitization
+5. **Environment Variables**: Use secure secret management for production
+6. **HTTPS**: Always use HTTPS in production
+7. **Authentication**: Implement proper OAuth or database-backed authentication
+
+## 🎨 UI Components
+
+The project uses shadcn/ui components including:
+
+- Button, Input, Select, Checkbox
+- Card, Badge, Table
+- Dialog, Sheet, Dropdown Menu
+- Form components with validation
+- Toast notifications
+
+## 📊 Features in Detail
+
+### Statistics Toolbar
+
+- Real-time device count statistics
+- Color-coded cards (blue for total, emerald for online, amber for offline)
+- Percentage calculations
+- Responsive grid layout
+
+### Device List
+
+- Sortable and filterable table
+- Search functionality with debouncing
+- Status badges with color indicators
+- Action dropdown menu for each device
+- Responsive design
+
+### Device Details Sheet
+
+- Comprehensive device information
+- Recent test results table
+- Chart visualization (optional)
+- Real-time data updates
+
+## 🚧 Development Notes
+
+- The application uses in-memory storage, so data is lost on server restart
+- Authentication is hardcoded for development purposes
+- All API endpoints require the `X-API-Key` header (default: `device-api-key-2024`)
+- The middleware protects `/dashboard/*` routes
+
+## 📝 License
+
+This project is private and proprietary.
+
+## 👥 Contributing
+
+This is a private project. For questions or issues, please contact the project maintainer.
+
+## 📞 Support
+
+For support, please open an issue in the repository or contact the development team.
+
+---
+
+**Built with ❤️ using Next.js, React, and TypeScript**
