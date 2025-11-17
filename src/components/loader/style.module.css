@@ -1,0 +1,45 @@
+.progress-bar {
+	position: absolute;
+	height: 4px;
+	width: 100%;
+	background: #0078d4;
+	/* background: linear-gradient(0deg, rgb(51, 141, 122) 0%, #1142b4); */
+	/* bottom: -5px; */
+	top: 0px;
+	left: 0px;
+	overflow: hidden;
+}
+
+.progress-fill {
+	position: absolute;
+	height: 4px;
+	width: 30%;
+	animation: progress-forward 0.9s infinite;
+	background: #afcbd6;
+	border-radius: 15px;
+	z-index: 49;
+	animation-delay: 0.3s;
+	animation-timing-function: ease-out;
+}
+.progress-fill2 {
+	position: absolute;
+	height: 4px;
+	width: 110px;
+	animation: progress-forward 0.9s infinite;
+	/* background: #a3a3a3; */
+	border-radius: 15px;
+	z-index: 49;
+
+	animation-timing-function: ease-in;
+	/* animation-delay: 0.1s; */
+}
+
+@keyframes progress-forward {
+	0% {
+		left: 0%;
+	}
+
+	100% {
+		left: 100%;
+	}
+}
